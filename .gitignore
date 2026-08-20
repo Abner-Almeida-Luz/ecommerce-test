@@ -1,0 +1,21 @@
+# Diretórios de IDE
+.idea/
+.vscode/
+*.iml
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Backend Java/Maven
+back/target/
+*.class
+
+# Frontend Node/React
+front/node_modules/
+front/dist/
+front/build/
+
+# Arquivos de ambiente (se não quiser versionar)
+.env
+.env.local

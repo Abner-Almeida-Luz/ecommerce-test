@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply antialiased;
+  @apply font-sans bg-neutral-50 text-neutral-900;
+}
