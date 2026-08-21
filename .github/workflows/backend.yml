@@ -1,0 +1,52 @@
+# .github/workflows/backend.yml
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ecommerce_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run tests
+        run: ./mvnw test
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ecommerce_test
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+
+      - name: Build
+        run: ./mvnw clean package -DskipTests
+
+  deploy:
+    needs: test  # só roda se os testes passarem
+    if: github.ref == 'refs/heads/main'  # só faz deploy a partir da main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Railway deploy
+        run: curl -X POST ${{ secrets.RAILWAY_DEPLOY_HOOK }}

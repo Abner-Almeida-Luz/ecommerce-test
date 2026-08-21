@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
+@Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CategoriesControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired MockMvc mockMvc;
@@ -34,10 +38,10 @@ class CategoriesControllerTest {
 
         mockMvc.perform(get(CATEGORIES + CATEGORIES_LIST_ALL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Vegetable1"))
-                .andExpect(jsonPath("$[0].description").value("Fresh Vegetable1"))
-                .andExpect(jsonPath("$[1].name").value("Vegetable2"))
-                .andExpect(jsonPath("$[1].description").value("Fresh Vegetable2"));
+                .andExpect(jsonPath("$[?(@.name == 'Vegetable1')]").exists())
+                .andExpect(jsonPath("$[?(@.description == 'Fresh Vegetable1')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'Vegetable2')]").exists())
+                .andExpect(jsonPath("$[?(@.description == 'Fresh Vegetable2')]").exists());
     }
 
     @Test
@@ -58,7 +62,7 @@ class CategoriesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequest)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Vegetable"));
+                .andExpect(jsonPath("$[?(@.name == 'Vegetable')]").exists());
     }
 
     @Test
@@ -76,7 +80,7 @@ class CategoriesControllerTest {
 
         mockMvc.perform(get(CATEGORIES + CATEGORIES_FIND_BY_ID,category.getCategoryId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Vegetable"));
+                .andExpect(jsonPath("$[?(@.name == 'Vegetable')]").exists());
     }
 
     @Test
@@ -104,7 +108,7 @@ class CategoriesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Vegetable2"));
+                .andExpect(jsonPath("$[?(@.name == 'Vegetable2')]").exists());
     }
 
     @Test

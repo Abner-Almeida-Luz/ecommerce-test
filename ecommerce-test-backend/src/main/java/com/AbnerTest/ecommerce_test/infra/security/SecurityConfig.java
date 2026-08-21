@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll() //alterar depois
-                                .anyRequest().permitAll())
+                                .anyRequest().authenticated())
                         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(securityfilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

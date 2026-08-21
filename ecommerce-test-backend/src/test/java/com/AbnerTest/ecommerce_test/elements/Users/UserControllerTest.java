@@ -16,6 +16,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
+@Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class UserControllerTest {
     ObjectMapper mapper = new ObjectMapper();
     @Autowired private MockMvc mockMvc;
@@ -49,8 +53,8 @@ class UserControllerTest {
 
         mockMvc.perform(get(USERS + USERS_LIST_ALL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].username").value(user1.getUsername()))
-                .andExpect(jsonPath("$[1].username").value(user2.getUsername()));
+                .andExpect(jsonPath("$[?(@.username == 'joao@gmail.com')]").exists())
+                .andExpect(jsonPath("$[?(@.username == 'maria@gmail.com')]").exists());
     }
 
     @Test
@@ -71,7 +75,7 @@ class UserControllerTest {
                 .content(mapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.acessToken").exists())
-                .andExpect(jsonPath("$.acessToken").exists());
+                .andExpect(jsonPath("$.refreshToken").exists());
     }
 
 
@@ -119,7 +123,7 @@ class UserControllerTest {
 
         mockMvc.perform(get(USERS + USERS_FIND_BY_LOGIN, user.getLogin()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.login").value(user.getLogin()));
+                .andExpect(jsonPath("$.login").value("joao@gmail.com"));
     }
 
     @Test

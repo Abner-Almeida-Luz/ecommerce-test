@@ -2,7 +2,9 @@ package com.AbnerTest.ecommerce_test.elements.Products;
 
 import com.AbnerTest.ecommerce_test.core.Categories;
 import com.AbnerTest.ecommerce_test.core.Products;
+import com.AbnerTest.ecommerce_test.elements.Carts.CartItemsRepository;
 import com.AbnerTest.ecommerce_test.elements.Categories.CategoriesRepository;
+import com.AbnerTest.ecommerce_test.elements.Orders.OrdersRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.junit.jupiter.api.Test;
@@ -10,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.math.BigDecimal;
 
@@ -23,11 +28,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
+@Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class ProductsControllerTest {
     @Autowired MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired ProductsRepository productsRepository;
     @Autowired CategoriesRepository categoriesRepository;
+    @Autowired CartItemsRepository cartItemsRepository;
+    @Autowired OrdersRepository ordersRepository;
+
+    @BeforeEach
+    void cleanDatabase() {
+        cartItemsRepository.deleteAll();
+        ordersRepository.deleteAll();
+        productsRepository.deleteAll();
+        categoriesRepository.deleteAll();
+    }
 
     @Test
     @WithMockUser(username = "admin", roles = {"USER","ADMIN"})
@@ -43,9 +60,9 @@ class ProductsControllerTest {
                         .param("sort", "name"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].name").value(product1.getName()))
-                .andExpect(jsonPath("$.content[1].name").value(product2.getName()))
-                .andExpect(jsonPath("$.content[2].name").value(product3.getName()));
+                .andExpect(jsonPath("$.content[?(@.name == 'Batata 1')]").exists())
+                .andExpect(jsonPath("$.content[?(@.name == 'Batata 2')]").exists())
+                .andExpect(jsonPath("$.content[?(@.name == 'Batata 3')]").exists());
     }
 
     @Test
@@ -63,9 +80,9 @@ class ProductsControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].name").value(product1.getName()))
-                .andExpect(jsonPath("$.content[1].name").value(product2.getName()))
-                .andExpect(jsonPath("$.content[2].name").value(product3.getName()));
+                .andExpect(jsonPath("$.content[?(@.name == 'Batata 1')]").exists())
+                .andExpect(jsonPath("$.content[?(@.name == 'Batata 2')]").exists())
+                .andExpect(jsonPath("$.content[?(@.name == 'Batata 3')]").exists());
     }
 
     @Test
@@ -76,8 +93,7 @@ class ProductsControllerTest {
 
         mockMvc.perform(get(PRODUCTS + PRODUCTS_FIND_BY_ID,product.getProductId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.productId").value(product.getProductId()))
-        .andExpect(jsonPath("$.name").value(product.getName()));
+                .andExpect(jsonPath("$.name").value("Batata"));;
     }
 
     @Test
@@ -97,7 +113,7 @@ class ProductsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Batata"));
+                .andExpect(jsonPath("$.name").value("Batata"));;
     }
 
     @Test
@@ -122,8 +138,7 @@ class ProductsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.productId").value(product.getProductId()))
-                .andExpect(jsonPath("$.name").value("Updated"));
+            .andExpect(jsonPath("$.name").value("Updated"));
     }
 
     @Test

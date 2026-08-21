@@ -1,0 +1,1 @@
+TRUNCATE TABLE cart_items, order_items, products, categories, carts, orders, users RESTART IDENTITY CASCADE;
