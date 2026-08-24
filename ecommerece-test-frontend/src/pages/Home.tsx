@@ -1,11 +1,10 @@
 // Home.jsx
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/toast';
 import { useProducts } from '../hooks/useProducts';
 import { useAuth } from '../contexts/AuthContext';
 import { addItem } from '../api/carts';
-import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 
 export default function Home() {
@@ -13,18 +12,18 @@ export default function Home() {
   const { products, pageInfo, loading, error } = useProducts(page);
   const { isAuthenticated, cartId } = useAuth();
 
-  const handleAddToCart = async (productId: number) => {
-    if (!cartId) {
-      toast.error('Faça login para adicionar ao carrinho');
-      return;
-    }
-    try {
-      await addItem({cartId, productId, quantity:1});
-      toast.success('Adicionado ao carrinho!');
-    } catch {
-      toast.error('Não foi possível adicionar');
-    }
-  };
+const handleAddToCart = async (productId: number) => {
+  if (!cartId) {
+    notify.error('Faça login para adicionar ao carrinho');
+    return;
+  }
+  try {
+    await addItem({ cartId, productId, quantity: 1 });
+    notify.success('Produto adicionado ao carrinho!');
+  } catch {
+    notify.error('Não foi possível adicionar o produto');
+  }
+};
 
   if (loading)
     return (
@@ -131,27 +130,28 @@ export default function Home() {
         </div>
       </section>
 
-      {pageInfo && pageInfo.totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
-                <Button
-                  variant="secondary"
-                  disabled={pageInfo.first}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  Anterior
-                </Button>
-                <span className="px-4 py-2">
-                  {page + 1} de {pageInfo.totalPages}
-                </span>
-                <Button
-                  variant="secondary"
-                  disabled={pageInfo.last}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Próxima
-                </Button>
-              </div>
-            )}
+     // Home.tsx (trecho da paginação)
+{pageInfo && pageInfo.totalPages > 1 && (
+  <div className="flex justify-center items-center gap-2 mt-10">
+    <button
+      onClick={() => setPage(p => Math.max(0, p - 1))}
+      disabled={pageInfo.first}
+      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-50"
+    >
+      Anterior
+    </button>
+    <span className="px-4 py-2">
+      Página {page + 1} de {pageInfo.totalPages}
+    </span>
+    <button
+      onClick={() => setPage(p => p + 1)}
+      disabled={pageInfo.last}
+      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-50"
+    >
+      Próxima
+    </button>
+  </div>
+)}
     </>
   );
 }

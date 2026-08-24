@@ -12,6 +12,7 @@ interface AuthContextType {
   isAdmin: boolean;
   login: (login: string, password: string) => Promise<void>;
   logout: () => void;
+  setCartId: (id: number | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -33,15 +34,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const login = async (loginStr: string, password: string) => {
-    const data = await loginApi(loginStr, password);
-    localStorage.setItem('token', data.token);
+    const data = await loginApi({ login: loginStr, password });
+    localStorage.setItem('token', data.acessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
     localStorage.setItem('userLogin', loginStr);
-    setToken(data.token);
+    setToken(data.acessToken);
     setUserLogin(loginStr);
 
-    const cart = await viewCart();
-    localStorage.setItem('cartId', String(cart.cartId));
-    setCartId(cart.cartId);
+    try {
+      const cart = await viewCart();
+      localStorage.setItem('cartId', String(cart.cartId));
+      setCartId(cart.cartId);
+    } catch {
+      setCartId(null);
+    }
   };
 
   const logout = () => {
@@ -62,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin: role === 'ADMIN',
         login,
         logout,
+        setCartId,
       }}
     >
       {children}

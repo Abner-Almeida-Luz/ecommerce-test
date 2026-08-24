@@ -11,6 +11,6 @@ public record OrderResponse(
         Long userId,
         OrderStatus status,
         BigDecimal total,
-        List<com.AbnerTest.ecommerce_test.core.OrderItems> orderItems,
+        List<OrderItemResponse> items,
         LocalDateTime createdAt
 ) { }

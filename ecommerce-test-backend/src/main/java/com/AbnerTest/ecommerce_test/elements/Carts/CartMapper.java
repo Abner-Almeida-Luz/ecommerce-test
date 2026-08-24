@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CartMapper {
     CartResponse toCartDTO(Carts cart);
+
+    @Mapping(source = "product.name", target = "productName")
+    @Mapping(source = "product.imageUrl", target = "productImageUrl")
     CartItemResponse toCartItemDTO(CartItems cartItem);
     CartItems toCartItemEntity(CartItemResponse cart);
 }

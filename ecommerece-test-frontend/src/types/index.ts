@@ -8,7 +8,8 @@ export interface UserResponse {
 }
 
 export interface LoginResponse {
-  token:string;
+  acessToken:string;
+  refreshToken:string
 }
 
 export interface CategoryResponse {
@@ -45,6 +46,7 @@ export interface ProductSummaryResponse {
   price:number;
   stock:number;
   imageUrl:string;
+  categoryName: string;
 }
 
 
@@ -55,6 +57,7 @@ export interface CartItemResponse {
   productName:string;
   quantity:number;
   total:string;
+  imageUrl: string;
 }
 
 export interface CartResponse {

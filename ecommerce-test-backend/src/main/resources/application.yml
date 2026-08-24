@@ -55,3 +55,14 @@ info:
   app:
     name: ecommerce-api
     version: 1.0.0
+
+---
+# Perfil Docker
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://host.docker.internal:5432/ecommerce_test?sslmode=disable
+    username: postgres
+    password: postgres123

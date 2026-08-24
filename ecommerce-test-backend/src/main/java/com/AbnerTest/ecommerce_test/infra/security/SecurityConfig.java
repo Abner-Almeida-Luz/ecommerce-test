@@ -34,8 +34,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
-                                .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll() //alterar depois
-                                .anyRequest().authenticated())
+                                .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).hasRole("ADMIN") //alterar depois
+                        .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_LIST_ALL).permitAll()
+                        .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_SEARCH).permitAll()
+                        .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_FIND_BY_ID).permitAll()
+                        .requestMatchers(HttpMethod.GET, CATEGORIES + CATEGORIES_LIST_ALL).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                        .anyRequest().authenticated())
                         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(securityfilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -48,6 +53,10 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        /* autorização do Vercel ainda: config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://seu-frontend.vercel.app"
+        ));*/
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

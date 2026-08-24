@@ -1,7 +1,8 @@
 import { useState, FormEvent } from 'react';
 import { ProductRequest } from '../types';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/toast';
 import { createProduct } from '../api/products';
+
 
 export default function CreateProduct() {
   const [form, setForm] = useState<ProductRequest>({
@@ -21,9 +22,10 @@ const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
   try {
     await createProduct(form);
-    toast.success('Produto criado!');
+    notify.success('Produto criado com sucesso!');
+    // opcional: limpar formulário ou redirecionar
   } catch {
-    toast.error('Erro ao criar produto');
+    notify.error('Erro ao criar produto');
   }
 };
 

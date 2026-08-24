@@ -7,7 +7,18 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
-    OrderResponse toOrderDTO(Orders cart);
-    OrderItemResponse toOrderItemDTO(OrderItems cartItem);
+
+    @Mapping(source = "user.userId", target = "userId")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "total", target = "total")
+    @Mapping(source = "orderItems", target = "items")
+    OrderResponse toOrderDTO(Orders order);
+
+    @Mapping(source = "product.productId", target = "productId")
+    @Mapping(source = "product.name", target = "productName")
+    @Mapping(source = "quantity", target = "quantity")
+    @Mapping(source = "total", target = "total")
+    OrderItemResponse toOrderItemDTO(OrderItems item);
+
     OrderItems toOrderItemEntity(OrderItemResponse cart);
 }
