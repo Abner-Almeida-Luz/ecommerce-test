@@ -66,3 +66,13 @@ spring:
     url: jdbc:postgresql://host.docker.internal:5432/ecommerce_test?sslmode=disable
     username: postgres
     password: postgres123
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}

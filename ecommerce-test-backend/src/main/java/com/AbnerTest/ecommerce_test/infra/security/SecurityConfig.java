@@ -53,10 +53,10 @@ public class SecurityConfig {
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-        /* autorização do Vercel ainda: config.setAllowedOrigins(List.of(
+        config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://seu-frontend.vercel.app"
-        ));*/
+                "https://ecommerce-test-ashen-nu.vercel.app"
+        ));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
