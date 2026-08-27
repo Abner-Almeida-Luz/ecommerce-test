@@ -10,7 +10,7 @@ export function useProducts(page: number) {
 
   useEffect(() => {
     setLoading(true);
-    listProducts(page)
+    listProducts({ page, size: 12, name: '', categoryId: 0, minPrice: 0, maxPrice: 0 })
       .then(setData)
       .catch(() => setError('Não foi possível carregar os produtos'))
       .finally(() => setLoading(false));

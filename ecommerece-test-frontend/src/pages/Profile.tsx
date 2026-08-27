@@ -1,10 +1,10 @@
-// src/pages/Profile.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
+import { Link } from 'react-router-dom';
+import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { listOrders } from '../api/orders';
 import type { OrderResponse, UserResponse } from '../types';
 import Spinner from '../components/ui/Spinner';
-import { Link } from 'react-router-dom';
 import { notify } from '../utils/toast';
 
 export default function Profile() {
@@ -13,27 +13,46 @@ export default function Profile() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
-const handleSave = async () => {
-  try {
-    // chamada para atualizar usuário
-    notify.success('Perfil atualizado com sucesso!');
-  } catch {
-    notify.error('Não foi possível atualizar o perfil');
-  }
-};
+  useEffect(() => {
+    const load = async () => {
+      if (!isAuthenticated || !userLogin) {
+        setLoading(false);
+        return;
+      }
 
-useEffect(() => {
-  const load = async () => {
+      try {
+        const userResponse = await api.get(`/users/find/${userLogin}`);
+        setUser(userResponse.data);
+
+        const ordersData = await listOrders();
+        setOrders(ordersData);
+      } catch {
+        notify.error('Erro ao carregar dados do perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [isAuthenticated, userLogin]);
+
+  const handleSave = async (e: FormEvent) => {
+    e.preventDefault();
     try {
-      // carregar dados
+      // futura chamada para atualizar usuário
+      notify.success('Perfil atualizado com sucesso!');
     } catch {
-      notify.error('Erro ao carregar histórico de pedidos');
+      notify.error('Não foi possível atualizar o perfil');
     }
   };
-  load();
-}, []);
 
-  if (loading) return <Spinner />;
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
@@ -79,7 +98,7 @@ useEffect(() => {
         <div className="flex-1 space-y-8">
           <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6">
             <h2 className="text-lg font-bold mb-4">Configurações da Conta</h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSave}>
               <div>
                 <label className="block text-sm font-semibold mb-1">Nome</label>
                 <input
@@ -142,7 +161,7 @@ useEffect(() => {
                     >
                       {order.status}
                     </span>
-                    <p className="font-bold">R$ {order.total.toFixed(2)}</p>
+                    <p className="font-bold">R$ {Number(order.total).toFixed(2)}</p>
                   </div>
                 ))}
               </div>

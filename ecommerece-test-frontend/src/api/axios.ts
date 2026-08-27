@@ -22,10 +22,9 @@ api.interceptors.response.use(
       error.config._retry = true;
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const { data } = await axios.post(`${baseURL}/users/refresh`, {
-          refreshToken,
-        });
-        localStorage.setItem('token', data.acessToken); // ⚠️ acessToken
+        const { data } = await api.post('/users/refresh', { refreshToken });
+        localStorage.setItem('token', data.acessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
         error.config.headers.Authorization = `Bearer ${data.acessToken}`;
         return api(error.config);
       } catch {

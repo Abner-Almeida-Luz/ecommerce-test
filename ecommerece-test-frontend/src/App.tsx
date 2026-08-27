@@ -16,7 +16,6 @@ import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import CreateProduct from './pages/CreateProduct';
 import { Toaster } from 'react-hot-toast';
-import { notify } from './utils/toast';
 
 export default function App() {
   return (
