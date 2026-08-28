@@ -55,7 +55,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://ecommerce-test-ashen-nu.vercel.app"
+                "https://ecommerce-test-4zjvtne67-ecommerce-test1.vercel.app"
         ));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
