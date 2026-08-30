@@ -29,7 +29,10 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("https://*.vercel.app"); // ou "*" para teste
+        // Permite origens do Vercel (qualquer subdomínio)
+        config.addAllowedOriginPattern("https://*.vercel.app");
+        // Para testes, você pode descomentar a linha abaixo (permite todas as origens)
+        // config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -40,11 +43,13 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .addFilterBefore(corsFilter(), CorsFilter.class)   // CORS no início
+                .addFilterBefore(corsFilter(), CorsFilter.class)   // CORS primeiro!
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        // PERMITE OPTIONS PARA TODAS AS ROTAS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // ROTAS PÚBLICAS
                         .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll()
