@@ -53,9 +53,9 @@ management:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.springframework.security: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    com.AbnerTest: DEBUG
 
 info:
   app:
