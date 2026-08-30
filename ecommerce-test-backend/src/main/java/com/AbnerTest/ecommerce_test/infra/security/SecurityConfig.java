@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
                                 .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
-                                .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).hasRole("ADMIN") //alterar depois
+                                .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll()
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_LIST_ALL).permitAll()
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_SEARCH).permitAll()
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_FIND_BY_ID).permitAll()
