@@ -1,7 +1,6 @@
 package com.AbnerTest.ecommerce_test.infra.security;
 
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,9 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -36,14 +32,15 @@ public class SecurityConfig {
         return http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
-                                .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
-                                .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll()
+                        .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
+                        .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
+                        .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll()
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_LIST_ALL).permitAll()
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_SEARCH).permitAll()
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_FIND_BY_ID).permitAll()
                         .requestMatchers(HttpMethod.GET, CATEGORIES + CATEGORIES_LIST_ALL).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // <-- ADICIONE
                         .anyRequest().authenticated())
                         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(securityfilter, UsernamePasswordAuthenticationFilter.class)
@@ -59,23 +56,11 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://ecommerce-test-nef4.vercel.app"
+                "https://*.vercel.app"
         ));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("https://ecommerce-test-nef4.vercel.app");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
     }
 
     @Bean
