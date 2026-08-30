@@ -7,6 +7,7 @@ import {
 import type { Page, ProductSummaryResponse, ProductResponse } from '../types';
 import { ProductRequest, SearchProductRequest } from '../types';
 
+
 export const listProducts = async (data:SearchProductRequest): Promise<Page<ProductSummaryResponse>> => {
   const response = await api.get(PRODUCTS_LIST_ALL, {
     params: data,
