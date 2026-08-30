@@ -14,10 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
+import org.springframework.web.filter.CorsFilter;
 
 import static com.AbnerTest.ecommerce_test.elements.ApiRoutes.*;
 
@@ -28,10 +26,25 @@ public class SecurityConfig {
     private final SecurityFilter securityfilter;
 
     @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("https://*.vercel.app"); // ou "*" para teste
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(csrf -> csrf.disable())
+        return http
+                .addFilterBefore(corsFilter(), CorsFilter.class)   // CORS no início
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll()
@@ -40,27 +53,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PRODUCTS + PRODUCTS_FIND_BY_ID).permitAll()
                         .requestMatchers(HttpMethod.GET, CATEGORIES + CATEGORIES_LIST_ALL).permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // <-- ADICIONE
-                        .anyRequest().authenticated())
-                        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(securityfilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "https://*.vercel.app"
-        ));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 
     @Bean
