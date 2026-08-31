@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import static com.AbnerTest.ecommerce_test.elements.ApiRoutes.*;
 
@@ -26,44 +25,27 @@ import static com.AbnerTest.ecommerce_test.elements.ApiRoutes.*;
 public class SecurityConfig {
     private final SecurityFilter securityfilter;
 
-    /*@Bean
-    public CorsFilter corsFilter() {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        // Permite origens do Vercel (qualquer subdomínio)
         config.addAllowedOriginPattern("https://*.vercel.app");
-        // Para testes, você pode descomentar a linha abaixo (permite todas as origens)
-        // config.addAllowedOrigin("*");
+        config.addAllowedOriginPattern("http://localhost:5173");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }*/
-
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        // ATENÇÃO: permita todas as origens (sem credenciais)
-        config.setAllowCredentials(false);   // <-- desative credenciais
-        config.addAllowedOrigin("*");        // <-- permita todas
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        return source;
     }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .addFilterBefore(corsFilter(), CorsFilter.class)   // CORS primeiro!
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <-- ESSENCIAL
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // PERMITE OPTIONS PARA TODAS AS ROTAS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // ROTAS PÚBLICAS
                         .requestMatchers(HttpMethod.POST, USERS + USERS_REFRESH).permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_LOGIN).permitAll()
                         .requestMatchers(HttpMethod.POST, USERS + USERS_REGISTER).permitAll()

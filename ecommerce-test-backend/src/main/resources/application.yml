@@ -4,8 +4,8 @@ spring:
   application:
     name: ecommerce-project
 
+  # Configuração do banco de dados (local, para desenvolvimento)
   datasource:
-    # Em desenvolvimento local, use esse valor (opcional)
     url: jdbc:postgresql://localhost:5432/ecommerce_test?sslmode=disable
     username: postgres
     password: postgres123
@@ -25,6 +25,17 @@ spring:
     locations: classpath:db/migration
     clean-on-validation-error: true
     baseline-on-migrate: true
+
+  # Configuração de CORS via Spring MVC (global)
+  web:
+    cors:
+      allowed-origins:
+        - "https://*.vercel.app"
+        - "http://localhost:5173"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
 
 server:
   port: 8080
@@ -53,9 +64,10 @@ management:
 
 logging:
   level:
-    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
     org.springframework.security: DEBUG
-    com.AbnerTest: DEBUG
+    org.springframework.web: DEBUG
 
 info:
   app:
@@ -63,7 +75,7 @@ info:
     version: 1.0.0
 
 ---
-# Perfil Docker
+# Perfil Docker (para execução local com Docker)
 spring:
   config:
     activate:
@@ -83,4 +95,15 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver   # <-- corrigido
+    driver-class-name: org.postgresql.Driver
+  # As configurações de CORS do bloco geral também são herdadas,
+  # mas mantemos explicitamente para garantir.
+  web:
+    cors:
+      allowed-origins:
+        - "https://*.vercel.app"
+        - "http://localhost:5173"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
