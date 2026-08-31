@@ -48,7 +48,7 @@ public class UserService {
         var auth = authenticationManager.authenticate(usernamePassword);
         var acessToken = tokenService.generateToken((Users) Objects.requireNonNull(auth.getPrincipal()));
         var refreshToken = tokenService.generateRefreshToken((Users) Objects.requireNonNull(auth.getPrincipal()));
-        log.info("Login completed. loginRequest={} acessToken={}, refreshToken={} ", request,acessToken,refreshToken);
+        log.info("Login completed. loginRequest={} accessToken={}, refreshToken={} ", request,acessToken,refreshToken);
         return new LoginResponse(acessToken, refreshToken);
     }
 

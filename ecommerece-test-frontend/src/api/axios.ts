@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
 const api = axios.create({
   baseURL:API_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -22,10 +27,10 @@ api.interceptors.response.use(
       error.config._retry = true;
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const { data } = await api.post('/users/refresh', { refreshToken });
-        localStorage.setItem('token', data.acessToken);
+        const { data } = await api.post<RefreshResponse>('/users/refresh', { refreshToken });
+        localStorage.setItem('token', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
-        error.config.headers.Authorization = `Bearer ${data.acessToken}`;
+        error.config.headers.Authorization = `Bearer ${data.accessToken}`;
         return api(error.config);
       } catch {
         localStorage.clear();
